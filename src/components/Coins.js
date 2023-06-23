@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Table, Checkbox, Pagination } from "flowbite-react/lib/esm";
 import { Link } from "react-router-dom";
-import { auth } from "../utils/Firebase";
+import { auth, db } from "../utils/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, addDoc } from "firebase/firestore"
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const Coins = () => {
   const [user, loading] = useAuthState(auth);
@@ -34,10 +40,30 @@ const Coins = () => {
 
   const onPageChange = (page) => setCurrentPage(page);
 
-  const handleWatchlist = () => {
-    console.log("calisti")
+  const handleWatchlist = async (e) => {
+    if (user) {
+      // if logged in
+      await setDoc(doc(db, "watchlists", user.uid), {
+        watchlist: []
+      });
+      const watchlistRef = doc(db, "watchlists", user.uid);
 
-  }
+      if (e.target.checked) {
+        // add to watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayUnion(e.target.value),
+        });
+      } else {
+        // remove from watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayRemove(e.target.value),
+        });
+      }
+    } else {
+      // if not logged in
+      console.log("uye girisi yapilmamis...");
+    }
+  };
 
   return (
     <div>
@@ -57,7 +83,10 @@ const Coins = () => {
               className="bg-white dark:border-gray-700 dark:bg-gray-800"
             >
               <Table.Cell className="!p-4">
-                <Checkbox value={coin.uuid} onChange={handleWatchlist} />
+                <Checkbox
+                  value={coin.uuid}
+                  onChange={(e) => handleWatchlist(e)}
+                />
               </Table.Cell>
               <Table.Cell>{coin.rank}</Table.Cell>
               <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
