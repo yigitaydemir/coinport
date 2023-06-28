@@ -43,10 +43,8 @@ const Coins = () => {
   const handleWatchlist = async (e) => {
     if (user) {
       // if logged in
-      await setDoc(doc(db, "watchlists", user.uid), {
-        watchlist: []
-      });
       const watchlistRef = doc(db, "watchlists", user.uid);
+      setDoc(watchlistRef, { capital: true }, { merge: true });
 
       if (e.target.checked) {
         // add to watchlist
