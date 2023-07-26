@@ -1,13 +1,22 @@
-import { useState } from "react";
-import { HiCheck } from "react-icons/hi";
+import { Toast } from "flowbite-react";
+import { HiCheck } from "react-icons/hi"
+import { useState, useImperativeHandle, forwardRef } from "react";
 
-const AddToast = () => {
-  const [show, setShow] = useState;
+const AddToast = ({ timeout = 1500 }, ref) => {
+    const [show, setShow] = useState(false)
+
+    useImperativeHandle(ref, () => ({
+        showToast() {
+            setShow(true)
+            setTimeout(() => {
+                setShow(false)
+            }, timeout)
+            console.log("burası da çalıştı")
+        }
+    }))
 
   return (
-    <Toast
-      className={`m-auto fixed border-2 mt-2 ml-2 ${show ? "hidden" : " "}`}
-    >
+    <Toast className={`m-auto fixed border-2 mt-2 ml-2 ${show ? "translate-x-0" : "-translate-x-96"}`}>
       <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
         <HiCheck className="h-5 w-5" />
       </div>
@@ -17,4 +26,4 @@ const AddToast = () => {
   );
 };
 
-export default AddToast;
+export default forwardRef(AddToast)

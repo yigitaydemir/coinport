@@ -1,24 +1,16 @@
 import { Route, Routes } from "react-router-dom";
-import { useRef } from "react";
 import "./App.css";
 import Nav from "./components/Nav";
 import Home from "./components/Home";
 import CoinDetail from "./components/CoinDetail";
 import About from "./components/About";
 import Watchlist from "./components/Watchlist";
-import { AddToast, RemoveToast, LoginToast } from "./components/Toasts";
+import AddToast from "./components/AddToast";
 
 function App() {
-  const AddToastRef = useRef();
-  const RemoveToastRef = useRef();
-  const LoginToastRef = useRef();
-
   return (
     <div>
-      <AddToast ref={AddToastRef}></AddToast>
-      <RemoveToast ref={RemoveToastRef}></RemoveToast>
-      <LoginToast ref={LoginToastRef}></LoginToast>
-
+      <AddToast></AddToast>
       <Nav></Nav>
 
       <Routes>

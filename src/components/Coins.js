@@ -10,19 +10,17 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { AddToast, RemoveToast, LoginToast } from "./Toasts"
+import AddToast from "./AddToast";
 
 const Coins = () => {
-  const AddToastRef = useRef()
-  const RemoveToastRef = useRef()
-  const LoginToastRef = useRef()
-
   const [user, loading] = useAuthState(auth);
 
   const [coins, setCoins] = useState();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [coinsPerPage, setCoinsPerPage] = useState(10);
+
+  const addToastRef = useRef()
 
   useEffect(() => {
     const options = {
@@ -45,6 +43,11 @@ const Coins = () => {
 
   const onPageChange = (page) => setCurrentPage(page);
 
+  const handleAddToast = () => {
+    addToastRef.current.showToast()
+    console.log("fonk çalıştı")
+  }
+
   const handleWatchlist = async (e) => {
     if (user) {
       // if logged in
@@ -56,28 +59,22 @@ const Coins = () => {
         await updateDoc(watchlistRef, {
           watchlist: arrayUnion(e.target.value),
         });
-        AddToastRef.current?.showToast()
       } else {
         // remove from watchlist
         await updateDoc(watchlistRef, {
           watchlist: arrayRemove(e.target.value),
         });
-        RemoveToastRef.current?.showToast()
       }
     } else {
       // if not logged in
       console.log("uye girisi yapilmamis...");
-      LoginToastRef.current?.showToast()
+      handleAddToast()
     }
   };
 
   return (
     <div>
-      <div className="hidden">
-        <AddToast ref={AddToastRef}></AddToast>
-        <RemoveToast ref={RemoveToastRef}></RemoveToast>
-        <LoginToast ref={LoginToastRef}></LoginToast>
-      </div>
+      <AddToast ref={addToastRef} timeout={3000}></AddToast>
 
       <Table hoverable className="w-full max-w-screen-xl m-auto my-5">
         <Table.Head>
