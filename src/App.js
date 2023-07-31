@@ -10,7 +10,6 @@ import AddToast from "./components/AddToast";
 function App() {
   return (
     <div>
-      <AddToast></AddToast>
       <Nav></Nav>
 
       <Routes>
