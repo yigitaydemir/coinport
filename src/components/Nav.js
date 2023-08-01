@@ -19,7 +19,7 @@ const Nav = () => {
   };
 
   return (
-    <Navbar fluid rounded className="w-full max-w-screen-xl m-auto">
+    <Navbar fluid rounded className="w-11/12 max-w-screen-xl m-auto">
       <Navbar.Brand href="#">
         <Link to="/" className="flex">
           <img

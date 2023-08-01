@@ -2,7 +2,7 @@ import { Toast } from "flowbite-react";
 import { HiX } from "react-icons/hi";
 import { useState, useImperativeHandle, forwardRef } from "react";
 
-const RemoveToast = ({ timeout = 1500 }, ref) => {
+const RemoveToast = ({ timeout = 3000 }, ref) => {
   const [show, setShow] = useState(false);
 
   useImperativeHandle(ref, () => ({

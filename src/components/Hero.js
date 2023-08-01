@@ -1,23 +1,88 @@
-import React from 'react'
+import React from "react";
 import Typewriter from "typewriter-effect";
+import Lottie from "lottie-react";
+import animationData from "../media/home.json";
+import { MdSupervisorAccount } from "react-icons/md";
+import { FaListUl } from "react-icons/fa";
+import { TbDeviceAnalytics } from "react-icons/tb";
 
 const Hero = () => {
   return (
-    <div className="flex flex-col justify-center items-center p-10 w-full max-w-screen-xl m-auto">
-      <h1 className="text-center text-5xl">Welcome to My Crypto App</h1>
-      <div className="text-center mt-6 text-lg">
-        <Typewriter
-          onInit={(typewritercomponent) => {
-            typewritercomponent
-              .typeString(
-                "Add your favorite cryptocurrencies to your watchlist to closely follow their performance and maximize your investment potential."
-              )
-              .start();
-          }}
-        ></Typewriter>
+    <div>
+      <div className="w-11/12 max-w-screen-xl m-auto flex my-10">
+        <div className="w-2/3 py-10 flex flex-col justify-center">
+          <p className="text-2xl">CoinBuzz</p>
+          <p className="text-7xl my-5">
+            Track Your Crypto <br /> Portfolio Easily
+          </p>
+          <p className="leading-7 tracking-wide text-md">
+            Add your favorite cryptocurrencies to your watchlist to closely
+            follow <br />
+            their performance and maximize your investment potential.
+          </p>
+        </div>
+
+        <div className="w-1/3">
+          <Lottie animationData={animationData}></Lottie>
+        </div>
+      </div>
+
+      <div className="w-11/12 max-w-screen-xl m-auto grid grid-cols-3 gap-10 my-10">
+        <div>
+          <p className="flex items-center text-xl">
+            <span className="text-2xl mr-1">
+              <MdSupervisorAccount></MdSupervisorAccount>
+            </span>
+            Create an Account
+          </p>
+          <p>
+            Sign up with Google to access your personalized watchlist and
+            portfolio
+          </p>
+        </div>
+
+        <div>
+          <p className="flex items-center text-xl">
+            <span className="text-2xl mr-1">
+              <FaListUl></FaListUl>
+            </span>
+            Build Your Watchlist
+          </p>
+          <p>
+            Explore the vast collection of cryptocurrencies and add your
+            favorite ones to your watchlist
+          </p>
+        </div>
+
+        <div>
+          <p className="flex items-center text-xl">
+            <span className="text-2xl mr-1">
+              <TbDeviceAnalytics></TbDeviceAnalytics>
+            </span>
+            Analyze and Invest
+          </p>
+          <p>
+            Dive into the detailed insights and performance graphs of each
+            cryptocurrency in your watchlist
+          </p>
+        </div>
       </div>
     </div>
-  )
-}
+    // <div className="flex flex-col justify-center items-center p-10 w-full max-w-screen-xl m-auto">
+    //   <h1 className="text-center text-5xl">Track Your Crypto Portfolio Easily</h1>
+    //   <div className="text-center mt-6 text-lg">
+    //     <Typewriter
+    //       onInit={(typewritercomponent) => {
+    //         typewritercomponent
+    //           .typeString(
+    //             "Add your favorite cryptocurrencies to your watchlist to closely follow their performance and maximize your investment potential."
+    //           )
+    //           .start();
+    //       }}
+    //     ></Typewriter>
+    //   </div>
+    // </div>
+  );
+};
 
-export default Hero
+export default Hero;

@@ -2,7 +2,7 @@ import { Toast } from "flowbite-react";
 import { HiExclamation } from "react-icons/hi";
 import { useState, useImperativeHandle, forwardRef } from "react";
 
-const LoginToast = ({ timeout = 1500 }, ref) => {
+const LoginToast = ({ timeout = 3000 }, ref) => {
   const [show, setShow] = useState(false);
 
   useImperativeHandle(ref, () => ({

@@ -22,9 +22,9 @@ const Coins = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [coinsPerPage, setCoinsPerPage] = useState(10);
 
-  const addToastRef = useRef()
-  const removeToastRef = useRef()
-  const LoginToastRef = useRef()
+  const addToastRef = useRef();
+  const removeToastRef = useRef();
+  const LoginToastRef = useRef();
 
   useEffect(() => {
     const options = {
@@ -48,17 +48,17 @@ const Coins = () => {
   const onPageChange = (page) => setCurrentPage(page);
 
   const handleAddToast = () => {
-    addToastRef.current.showToast()
-    console.log("fonk çalıştı")
-  }
+    addToastRef.current.showToast();
+    console.log("fonk çalıştı");
+  };
 
   const handleRemoveToast = () => {
-    removeToastRef.current.showToast()
-  }
+    removeToastRef.current.showToast();
+  };
 
   const handleLoginToast = () => {
-    LoginToastRef.current.showToast()
-  }
+    LoginToastRef.current.showToast();
+  };
 
   const handleWatchlist = async (e) => {
     if (user) {
@@ -71,18 +71,18 @@ const Coins = () => {
         await updateDoc(watchlistRef, {
           watchlist: arrayUnion(e.target.value),
         });
-        handleAddToast()
+        handleAddToast();
       } else {
         // remove from watchlist
         await updateDoc(watchlistRef, {
           watchlist: arrayRemove(e.target.value),
         });
-        handleRemoveToast()
+        handleRemoveToast();
       }
     } else {
       // if not logged in
       console.log("uye girisi yapilmamis...");
-      handleLoginToast()
+      handleLoginToast();
     }
   };
 
@@ -92,57 +92,59 @@ const Coins = () => {
       <RemoveToast ref={removeToastRef} timeout={3000}></RemoveToast>
       <LoginToast ref={LoginToastRef} timeout={3000}></LoginToast>
 
-      <Table hoverable className="w-full max-w-screen-xl m-auto my-5">
-        <Table.Head>
-          <Table.HeadCell></Table.HeadCell>
-          <Table.HeadCell>Rank</Table.HeadCell>
-          <Table.HeadCell>Name</Table.HeadCell>
-          <Table.HeadCell className="text-right">Price</Table.HeadCell>
-          <Table.HeadCell className="text-right">24 %</Table.HeadCell>
-          <Table.HeadCell className="text-right">Market Cap</Table.HeadCell>
-        </Table.Head>
-        <Table.Body className="divide-y">
-          {currentCoins?.map((coin) => (
-            <Table.Row
-              key={coin.rank}
-              className="bg-white dark:border-gray-700 dark:bg-gray-800"
-            >
-              <Table.Cell className="!p-4">
-                <Checkbox
-                  value={coin.uuid}
-                  onChange={(e) => handleWatchlist(e)}
-                />
-              </Table.Cell>
-              <Table.Cell>{coin.rank}</Table.Cell>
-              <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
-                <img src={coin.iconUrl} className="w-7"></img>
-                <Link to={`/coins/${coin.uuid}`}>
-                  <span className="mx-2 text-gray-900 dark:text-white">
-                    {coin.name}
-                  </span>
-                </Link>
-
-                <span className="text-grey-100">{coin.symbol}</span>
-              </Table.Cell>
-              <Table.Cell className="text-right">
-                {Number(coin.price).toFixed(5)}
-              </Table.Cell>
-              <Table.Cell
-                className={
-                  Number(coin.change) < 0
-                    ? "text-red-500 text-right"
-                    : "text-green-500 text-right"
-                }
+      <div className="w-11/12 max-w-screen-xl m-auto">
+        <Table hoverable>
+          <Table.Head>
+            <Table.HeadCell></Table.HeadCell>
+            <Table.HeadCell>Rank</Table.HeadCell>
+            <Table.HeadCell>Name</Table.HeadCell>
+            <Table.HeadCell className="text-right">Price</Table.HeadCell>
+            <Table.HeadCell className="text-right">24 %</Table.HeadCell>
+            <Table.HeadCell className="text-right">Market Cap</Table.HeadCell>
+          </Table.Head>
+          <Table.Body className="divide-y">
+            {currentCoins?.map((coin) => (
+              <Table.Row
+                key={coin.rank}
+                className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
-                {coin.change}
-              </Table.Cell>
-              <Table.Cell className="text-right">
-                {Number(coin.marketCap).toLocaleString()}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+                <Table.Cell className="!p-4">
+                  <Checkbox
+                    value={coin.uuid}
+                    onChange={(e) => handleWatchlist(e)}
+                  />
+                </Table.Cell>
+                <Table.Cell>{coin.rank}</Table.Cell>
+                <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
+                  <img src={coin.iconUrl} className="w-7"></img>
+                  <Link to={`/coins/${coin.uuid}`}>
+                    <span className="mx-2 text-gray-900 dark:text-white">
+                      {coin.name}
+                    </span>
+                  </Link>
+
+                  <span className="text-grey-100">{coin.symbol}</span>
+                </Table.Cell>
+                <Table.Cell className="text-right">
+                  {Number(coin.price).toFixed(5)}
+                </Table.Cell>
+                <Table.Cell
+                  className={
+                    Number(coin.change) < 0
+                      ? "text-red-500 text-right"
+                      : "text-green-500 text-right"
+                  }
+                >
+                  {coin.change}
+                </Table.Cell>
+                <Table.Cell className="text-right">
+                  {Number(coin.marketCap).toLocaleString()}
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </div>
 
       <div className="flex items-center justify-center">
         <Pagination
