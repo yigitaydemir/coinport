@@ -25,7 +25,7 @@ const Hero = () => {
         </div>
       </div>
 
-      <div className="w-11/12 max-w-screen-xl m-auto grid grid-cols-1 sm:grid-cols-3 gap-10 my-10">
+      <div className="w-11/12 max-w-screen-xl m-auto grid grid-cols-1 sm:grid-cols-3 gap-10 my-20">
         <div>
           <p className="flex items-center text-xl">
             <span className="text-2xl mr-1">

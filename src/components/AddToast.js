@@ -11,7 +11,6 @@ const AddToast = ({ timeout = 3000 }, ref) => {
             setTimeout(() => {
                 setShow(false)
             }, timeout)
-            console.log("burası da çalıştı")
         }
     }))
 

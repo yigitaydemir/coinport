@@ -49,7 +49,6 @@ const Coins = () => {
 
   const handleAddToast = () => {
     addToastRef.current.showToast();
-    console.log("fonk çalıştı");
   };
 
   const handleRemoveToast = () => {
@@ -81,10 +80,13 @@ const Coins = () => {
       }
     } else {
       // if not logged in
-      console.log("uye girisi yapilmamis...");
       handleLoginToast();
     }
   };
+
+  const handleCheck = () => {
+
+  } 
 
   return (
     <div>
@@ -112,6 +114,7 @@ const Coins = () => {
                   <Checkbox
                     value={coin.uuid}
                     onChange={(e) => handleWatchlist(e)}
+                    
                   />
                 </Table.Cell>
                 <Table.Cell>{coin.rank}</Table.Cell>

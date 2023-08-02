@@ -1,11 +1,47 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { auth } from "../utils/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Alert, Card, Table } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../utils/Firebase";
+import { Link } from "react-router-dom";
+import { Checkbox } from "flowbite-react";
 
 const Watchlist = () => {
   const [user, loading] = useAuthState(auth);
+  const [watchlist, setWatchlist] = useState();
+  const [coins, setCoins] = useState();
+
+  useEffect(() => {
+    getWatchlist();
+    console.log(watchlist);
+
+    const options = {
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token":
+          "coinrankingffd88d7f1f3ded6efdd4294f69bc4947eaeea7a7afd17f66",
+      },
+    };
+
+    fetch("https://api.coinranking.com/v2/coins", options)
+      .then((response) => response.json())
+      .then((result) => setCoins(result.data.coins));
+
+    console.log(coins);
+  }, []);
+
+  const getWatchlist = async () => {
+    if (user) {
+      const docRef = doc(db, "watchlists", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setWatchlist(docSnap.data().watchlist);
+      }
+    }
+  };
 
   return (
     <div className="flex item-center justify-center">
@@ -13,7 +49,7 @@ const Watchlist = () => {
         <Alert
           color="failure"
           icon={HiInformationCircle}
-          className="m-5 w-11/12 m-auto max-w-screen-xl"
+          className="w-11/12 m-auto max-w-screen-xl my-5"
         >
           <span>
             <p>
@@ -67,44 +103,46 @@ const Watchlist = () => {
                 </Table.HeadCell>
               </Table.Head>
 
-              {/* <Table.Body className="divide-y">
-          {currentCoins?.map((coin) => (
-            <Table.Row
-              key={coin.rank}
-              className="bg-white dark:border-gray-700 dark:bg-gray-800"
-            >
-              <Table.Cell className="!p-4">
-                <Checkbox />
-              </Table.Cell>
-              <Table.Cell>{coin.rank}</Table.Cell>
-              <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
-                <img src={coin.iconUrl} className="w-7"></img>
-                <Link to={`/coins/${coin.uuid}`}>
-                  <span className="mx-2 text-gray-900 dark:text-white">
-                    {coin.name}
-                  </span>
-                </Link>
+              <Table.Body className="divide-y">
+                {coins
+                  ?.filter((coin) => watchlist?.includes(coin.uuid))
+                  .map((coin) => (
+                    <Table.Row
+                      key={coin.rank}
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <Table.Cell className="!p-4">
+                        <Checkbox />
+                      </Table.Cell>
+                      <Table.Cell>{coin.rank}</Table.Cell>
+                      <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
+                        <img src={coin.iconUrl} className="w-7"></img>
+                        <Link to={`/coins/${coin.uuid}`}>
+                          <span className="mx-2 text-gray-900 dark:text-white">
+                            {coin.name}
+                          </span>
+                        </Link>
 
-                <span className="text-grey-100">{coin.symbol}</span>
-              </Table.Cell>
-              <Table.Cell className="text-right">
-                {Number(coin.price).toFixed(5)}
-              </Table.Cell>
-              <Table.Cell
-                className={
-                  Number(coin.change) < 0
-                    ? "text-red-500 text-right"
-                    : "text-green-500 text-right"
-                }
-              >
-                {coin.change}
-              </Table.Cell>
-              <Table.Cell className="text-right">
-                {Number(coin.marketCap).toLocaleString()}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body> */}
+                        <span className="text-grey-100">{coin.symbol}</span>
+                      </Table.Cell>
+                      <Table.Cell className="text-right">
+                        {Number(coin.price).toFixed(5)}
+                      </Table.Cell>
+                      <Table.Cell
+                        className={
+                          Number(coin.change) < 0
+                            ? "text-red-500 text-right"
+                            : "text-green-500 text-right"
+                        }
+                      >
+                        {coin.change}
+                      </Table.Cell>
+                      <Table.Cell className="text-right">
+                        {Number(coin.marketCap).toLocaleString()}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+              </Table.Body>
             </Table>
           </div>
           {/* <div className="flex items-center justify-center">
