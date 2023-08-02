@@ -25,7 +25,7 @@ const Nav = () => {
         <Link to="/" className="flex">
           <img alt="Logo" className="mr-3 h-6 sm:h-14" src={logo}></img>
           <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
-            CoinBuzz
+            CoinPort
           </span>
         </Link>
       </Navbar.Brand>
