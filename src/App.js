@@ -5,7 +5,6 @@ import Home from "./components/Home";
 import CoinDetail from "./components/CoinDetail";
 import About from "./components/About";
 import Watchlist from "./components/Watchlist";
-import AddToast from "./components/AddToast";
 
 function App() {
   return (

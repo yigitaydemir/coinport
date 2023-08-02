@@ -1,5 +1,3 @@
-import React from "react";
-import Typewriter from "typewriter-effect";
 import Lottie from "lottie-react";
 import animationData from "../media/home.json";
 import { MdSupervisorAccount } from "react-icons/md";
@@ -68,20 +66,6 @@ const Hero = () => {
         </div>
       </div>
     </div>
-    // <div className="flex flex-col justify-center items-center p-10 w-full max-w-screen-xl m-auto">
-    //   <h1 className="text-center text-5xl">Track Your Crypto Portfolio Easily</h1>
-    //   <div className="text-center mt-6 text-lg">
-    //     <Typewriter
-    //       onInit={(typewritercomponent) => {
-    //         typewritercomponent
-    //           .typeString(
-    //             "Add your favorite cryptocurrencies to your watchlist to closely follow their performance and maximize your investment potential."
-    //           )
-    //           .start();
-    //       }}
-    //     ></Typewriter>
-    //   </div>
-    // </div>
   );
 };
 

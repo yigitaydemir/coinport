@@ -1,5 +1,5 @@
 import { ColorType, createChart } from "lightweight-charts";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card, Badge } from "flowbite-react";
 

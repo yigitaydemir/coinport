@@ -23,11 +23,6 @@ const Nav = () => {
     <Navbar fluid rounded className="w-11/12 max-w-screen-xl m-auto border-b-2 border-black rounded-none">
       <Navbar.Brand href="#">
         <Link to="/" className="flex">
-          {/* <img
-            alt="Flowbite React Logo"
-            className="mr-3 h-6 sm:h-9"
-            src="https://preview.redd.it/n20zr2c13vb71.png?width=460&format=png&auto=webp&v=enabled&s=61ecaeb144579520463435437437dd11b37f1a48"
-          /> */}
           <img alt="Logo" className="mr-3 h-6 sm:h-14" src={logo}></img>
           <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
             CoinBuzz
