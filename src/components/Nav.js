@@ -3,6 +3,7 @@ import { Navbar, Dropdown, Avatar, Button } from "flowbite-react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import logo from "../media/logo.png"
 
 const Nav = () => {
   const [user, loading] = useAuthState(auth);
@@ -19,16 +20,17 @@ const Nav = () => {
   };
 
   return (
-    <Navbar fluid rounded className="w-11/12 max-w-screen-xl m-auto">
+    <Navbar fluid rounded className="w-11/12 max-w-screen-xl m-auto border-b-2 border-black rounded-none">
       <Navbar.Brand href="#">
         <Link to="/" className="flex">
-          <img
+          {/* <img
             alt="Flowbite React Logo"
             className="mr-3 h-6 sm:h-9"
             src="https://preview.redd.it/n20zr2c13vb71.png?width=460&format=png&auto=webp&v=enabled&s=61ecaeb144579520463435437437dd11b37f1a48"
-          />
-          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-            TradingView
+          /> */}
+          <img alt="Logo" className="mr-3 h-6 sm:h-14" src={logo}></img>
+          <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
+            CoinBuzz
           </span>
         </Link>
       </Navbar.Brand>
@@ -56,8 +58,8 @@ const Nav = () => {
       </div>
 
       <Navbar.Collapse>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/about">About</NavLink>
+        <NavLink to="/" className="text-lg">Home</NavLink>
+        <NavLink to="/about" className="text-lg">About</NavLink>
       </Navbar.Collapse>
     </Navbar>
   );

@@ -9,8 +9,8 @@ import { TbDeviceAnalytics } from "react-icons/tb";
 const Hero = () => {
   return (
     <div>
-      <div className="w-11/12 max-w-screen-xl m-auto flex my-10">
-        <div className="w-2/3 py-10 flex flex-col justify-center">
+      <div className="w-11/12 max-w-screen-xl m-auto flex my-10 flex-col md:flex-row">
+        <div className="w-full md:w-2/3 py-10 flex flex-col justify-center">
           <p className="text-2xl">CoinBuzz</p>
           <p className="text-7xl my-5">
             Track Your Crypto <br /> Portfolio Easily
@@ -22,7 +22,7 @@ const Hero = () => {
           </p>
         </div>
 
-        <div className="w-1/3">
+        <div className="w-full md:w-1/3">
           <Lottie animationData={animationData}></Lottie>
         </div>
       </div>
