@@ -1,17 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { auth } from "../utils/Firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Alert, Card, Table } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  setDoc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../utils/Firebase";
 import { Link } from "react-router-dom";
 import { Checkbox } from "flowbite-react";
+import AddToast from "./AddToast";
+import RemoveToast from "./RemoveToast";
 
 const Watchlist = () => {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const [watchlist, setWatchlist] = useState();
   const [coins, setCoins] = useState();
+
+  const addToastRef = useRef();
+  const removeToastRef = useRef();
 
   useEffect(() => {
     getWatchlist();
@@ -43,8 +55,41 @@ const Watchlist = () => {
     }
   };
 
+  const handleAddToast = () => {
+    addToastRef.current.showToast();
+  };
+
+  const handleRemoveToast = () => {
+    removeToastRef.current.showToast();
+  };
+
+  const handleWatchlist = async (e) => {
+    if (user) {
+      // if logged in
+      const watchlistRef = doc(db, "watchlists", user.uid);
+      setDoc(watchlistRef, { capital: true }, { merge: true });
+
+      if (e.target.checked) {
+        // add to watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayUnion(e.target.value),
+        });
+        handleAddToast();
+      } else {
+        // remove from watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayRemove(e.target.value),
+        });
+        handleRemoveToast();
+      }
+    }
+  };
+
   return (
     <div className="flex item-center justify-center">
+      <AddToast ref={addToastRef} timeout={3000}></AddToast>
+      <RemoveToast ref={removeToastRef} timeout={3000}></RemoveToast>
+
       {!user && (
         <Alert
           color="failure"
@@ -53,8 +98,9 @@ const Watchlist = () => {
         >
           <span>
             <p>
-              <span className="font-medium">Info alert!</span>
-              You have to login to see/create your watchlist
+              <span className="font-medium">
+                You have to login to see/create your watchlist!
+              </span>
             </p>
           </span>
         </Alert>
@@ -112,7 +158,10 @@ const Watchlist = () => {
                       className="bg-white dark:border-gray-700 dark:bg-gray-800"
                     >
                       <Table.Cell className="!p-4">
-                        <Checkbox />
+                        <Checkbox
+                          value={coin.uuid}
+                          onChange={(e) => handleWatchlist(e)}
+                        />
                       </Table.Cell>
                       <Table.Cell>{coin.rank}</Table.Cell>
                       <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
@@ -145,16 +194,6 @@ const Watchlist = () => {
               </Table.Body>
             </Table>
           </div>
-          {/* <div className="flex items-center justify-center">
-        <Pagination
-          currentPage={currentPage}
-          onPageChange={(page) => {
-            setCurrentPage(page);
-          }}
-          showIcons
-          totalPages={5}
-          className="inline-block my-4"
-        /> */}
         </Card>
       )}
     </div>

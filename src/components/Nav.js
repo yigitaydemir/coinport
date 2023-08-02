@@ -54,6 +54,7 @@ const Nav = () => {
 
       <Navbar.Collapse>
         <NavLink to="/" className="text-lg">Home</NavLink>
+        <NavLink to="/watchlist" className="text-lg">Watchlist</NavLink>
         <NavLink to="/about" className="text-lg">About</NavLink>
       </Navbar.Collapse>
     </Navbar>
