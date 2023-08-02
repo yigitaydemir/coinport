@@ -21,14 +21,23 @@ const Watchlist = () => {
   const [user] = useAuthState(auth);
   const [watchlist, setWatchlist] = useState();
   const [coins, setCoins] = useState();
+  const [checkboxStates, setCheckboxStates] = useState({});
 
   const addToastRef = useRef();
   const removeToastRef = useRef();
 
   useEffect(() => {
-    getWatchlist();
-    console.log(watchlist);
+    const fetchData = async () => {
+      await Promise.all([
+        getWatchlist(),
+        fetchCoinsData()
+      ]);
+    };
 
+    fetchData();
+  }, [user]);
+
+  const fetchCoinsData = async () => {
     const options = {
       headers: {
         "Content-Type": "application/json",
@@ -37,12 +46,29 @@ const Watchlist = () => {
       },
     };
 
-    fetch("https://api.coinranking.com/v2/coins", options)
-      .then((response) => response.json())
-      .then((result) => setCoins(result.data.coins));
+    const response = await fetch("https://api.coinranking.com/v2/coins", options);
+    const result = await response.json();
+    setCoins(result.data.coins);
 
-    console.log(coins);
-  }, []);
+    // Remove the re-declaration of watchlist here
+    if (coins && watchlist) {
+      const initialCheckboxStates = coins.reduce((acc, coin) => {
+        acc[coin.uuid] = watchlist.includes(coin.uuid);
+        return acc;
+      }, {});
+      setCheckboxStates(initialCheckboxStates);
+    }
+  };
+
+  useEffect(() => {
+    if (coins && watchlist) {
+      const updatedCheckboxStates = coins.reduce((acc, coin) => {
+        acc[coin.uuid] = watchlist.includes(coin.uuid);
+        return acc;
+      }, {});
+      setCheckboxStates(updatedCheckboxStates);
+    }
+  }, [coins, watchlist]);
 
   const getWatchlist = async () => {
     if (user) {
@@ -63,9 +89,13 @@ const Watchlist = () => {
     removeToastRef.current.showToast();
   };
 
-  const handleWatchlist = async (e) => {
+  const handleWatchlist = async (e, coinUUID) => {
     if (user) {
       // if logged in
+      const updatedCheckboxStates = { ...checkboxStates };
+      updatedCheckboxStates[coinUUID] = e.target.checked;
+      setCheckboxStates(updatedCheckboxStates);
+
       const watchlistRef = doc(db, "watchlists", user.uid);
       setDoc(watchlistRef, { capital: true }, { merge: true });
 
@@ -160,7 +190,8 @@ const Watchlist = () => {
                       <Table.Cell className="!p-4">
                         <Checkbox
                           value={coin.uuid}
-                          onChange={(e) => handleWatchlist(e)}
+                          onChange={(e) => handleWatchlist(e, coin.uuid)}
+                          checked={checkboxStates[coin.uuid] || false}
                         />
                       </Table.Cell>
                       <Table.Cell>{coin.rank}</Table.Cell>

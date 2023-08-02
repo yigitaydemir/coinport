@@ -9,24 +9,29 @@ import {
   doc,
   setDoc,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import AddToast from "./AddToast";
 import RemoveToast from "./RemoveToast";
 import LoginToast from "./LoginToast";
 
 const Coins = () => {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
 
   const [coins, setCoins] = useState();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [coinsPerPage, setCoinsPerPage] = useState(10);
 
+  const [checkboxStates, setCheckboxStates] = useState({});
+
   const addToastRef = useRef();
   const removeToastRef = useRef();
   const LoginToastRef = useRef();
 
   useEffect(() => {
+    let isMounted = true;
+
     const options = {
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +43,34 @@ const Coins = () => {
     fetch("https://api.coinranking.com/v2/coins", options)
       .then((response) => response.json())
       .then((result) => setCoins(result.data.coins));
+
+    return () => {
+      isMounted = false; // Cleanup function to set isMounted to false on unmount
+    };
   }, []);
+
+  useEffect(() => {
+    if (user && coins) {
+      const watchlistRef = doc(db, "watchlists", user.uid);
+      getDoc(watchlistRef)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            const watchlistData = docSnap.data();
+            const initialCheckboxStates = coins.reduce((acc, coin) => {
+              acc[coin.uuid] = watchlistData.watchlist.includes(coin.uuid);
+              return acc;
+            }, {});
+            setCheckboxStates(initialCheckboxStates);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching watchlist:", error);
+        });
+    } else {
+      // If user is not logged in or coins are not fetched, reset checkbox states
+      setCheckboxStates({});
+    }
+  }, [user, coins]);
 
   // Get Current Coins
   const indexOfLastCoin = currentPage * coinsPerPage;
@@ -59,22 +91,26 @@ const Coins = () => {
     LoginToastRef.current.showToast();
   };
 
-  const handleWatchlist = async (e) => {
+  const handleWatchlist = async (e, coinUUID) => {
     if (user) {
       // if logged in
+      const updatedCheckboxStates = { ...checkboxStates };
+      updatedCheckboxStates[coinUUID] = e.target.checked;
+      setCheckboxStates(updatedCheckboxStates);
+
       const watchlistRef = doc(db, "watchlists", user.uid);
       setDoc(watchlistRef, { capital: true }, { merge: true });
 
       if (e.target.checked) {
         // add to watchlist
         await updateDoc(watchlistRef, {
-          watchlist: arrayUnion(e.target.value),
+          watchlist: arrayUnion(coinUUID),
         });
         handleAddToast();
       } else {
         // remove from watchlist
         await updateDoc(watchlistRef, {
-          watchlist: arrayRemove(e.target.value),
+          watchlist: arrayRemove(coinUUID),
         });
         handleRemoveToast();
       }
@@ -83,10 +119,6 @@ const Coins = () => {
       handleLoginToast();
     }
   };
-
-  const handleCheck = () => {
-
-  } 
 
   return (
     <div>
@@ -113,8 +145,8 @@ const Coins = () => {
                 <Table.Cell className="!p-4">
                   <Checkbox
                     value={coin.uuid}
-                    onChange={(e) => handleWatchlist(e)}
-                    
+                    onChange={(e) => handleWatchlist(e, coin.uuid)}
+                    checked={checkboxStates[coin.uuid] || false}
                   />
                 </Table.Cell>
                 <Table.Cell>{coin.rank}</Table.Cell>
