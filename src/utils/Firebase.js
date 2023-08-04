@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDsLomS9rnASZnQ53e2vuwJ6TDMcxtYesg",
+  apiKey: `${process.env.REACT_APP_FIREBASE_KEY}`,
   authDomain: "tradingviewclone.firebaseapp.com",
   projectId: "tradingviewclone",
   storageBucket: "tradingviewclone.appspot.com",

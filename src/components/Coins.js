@@ -36,7 +36,7 @@ const Coins = () => {
       headers: {
         "Content-Type": "application/json",
         "x-access-token":
-          "coinrankingffd88d7f1f3ded6efdd4294f69bc4947eaeea7a7afd17f66",
+          `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
     };
 
@@ -126,7 +126,7 @@ const Coins = () => {
       <RemoveToast ref={removeToastRef} timeout={3000}></RemoveToast>
       <LoginToast ref={LoginToastRef} timeout={3000}></LoginToast>
 
-      <div className="w-11/12 max-w-screen-xl m-auto">
+      <div className="w-11/12 max-w-screen-xl m-auto overflow-auto">
         <Table hoverable>
           <Table.Head>
             <Table.HeadCell></Table.HeadCell>

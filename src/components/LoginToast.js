@@ -16,7 +16,7 @@ const LoginToast = ({ timeout = 3000 }, ref) => {
 
   return (
     <Toast
-      className={`z-10 fixed top-10 left-10 m-auto border-2 mt-2 ml-2 ${
+      className={`z-10 fixed top-5 left-5 sm:top-10 sm:left-10 m-auto border-2 mt-2 ml-2 ${
         show ? "translate-x-0" : "-translate-x-96"
       }`}
     >

@@ -42,7 +42,7 @@ const Watchlist = () => {
       headers: {
         "Content-Type": "application/json",
         "x-access-token":
-          "coinrankingffd88d7f1f3ded6efdd4294f69bc4947eaeea7a7afd17f66",
+        `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
     };
 
@@ -166,7 +166,7 @@ const Watchlist = () => {
             </div>
           </div>
 
-          <div className="w-11/12 max-w-screen-xl m-auto my-5">
+          <div className="w-11/12 max-w-screen-xl m-auto my-5 overflow-auto">
             <Table hoverable>
               <Table.Head>
                 <Table.HeadCell></Table.HeadCell>

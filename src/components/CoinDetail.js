@@ -116,7 +116,7 @@ const CoinDetail = () => {
     const options = {
       headers: {
         "x-access-token":
-          "coinrankingffd88d7f1f3ded6efdd4294f69bc4947eaeea7a7afd17f66",
+        `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
     };
 
@@ -162,8 +162,6 @@ const CoinDetail = () => {
     { time: "2018-12-31", value: 22.67 },
   ];
 
-  console.log(coin);
-
   return (
     <div>
       <AddToast ref={addToastRef} timeout={3000}></AddToast>
@@ -188,7 +186,7 @@ const CoinDetail = () => {
           </div>
         </div>
 
-        <div className="w-11/12 m-auto" ref={chartContainerRef}></div>
+        <div className="w-11/12 m-auto overflow-auto" ref={chartContainerRef}></div>
 
         <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
           <p>Description</p>
