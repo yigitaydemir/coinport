@@ -1,12 +1,16 @@
-import { Card, Timeline } from "flowbite-react"
-import profilePic from "../media/profilepic.jpg"
+import { Card, Timeline } from "flowbite-react";
+import profilePic from "../media/profilepic.jpg";
 
 const About = () => {
   return (
     <Card className="w-11/12 max-w-screen-xl m-auto my-5">
       <div className="flex justify-end px-4 pt-4"></div>
       <div className="flex flex-col items-center pb-10">
-        <img src={profilePic} alt="profile picture" className="h-24 mb-3 rounded-full shadow-lg" />
+        <img
+          src={profilePic}
+          alt="profile picture"
+          className="h-24 mb-3 rounded-full shadow-lg"
+        />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
           Yusuf Yiğit Aydemir
         </h5>
@@ -119,7 +123,7 @@ const About = () => {
                   >
                     TailwindCSS
                   </a>{" "}
-                  and {" "}
+                  and{" "}
                   <a
                     href="https://www.flowbite-react.com/"
                     target="blank"
@@ -147,6 +151,24 @@ const About = () => {
                   </a>
                   , providing secure and reliable user authentication through
                   Google accounts.
+                </Timeline.Body>
+              </Timeline.Content>
+            </Timeline.Item>
+
+            <Timeline.Item>
+              <Timeline.Point />
+              <Timeline.Content>
+                <Timeline.Body>
+                  Watchlist feature powered by{" "}
+                  <a
+                    href="https://firebase.google.com/docs/firestore/quickstart?hl=tr"
+                    target="blank"
+                    className="text-cyan-800"
+                  >
+                    Google Firestore
+                  </a>{" "}
+                  database, enabling users to track and manage their favorite
+                  cryptocurrencies in real-time within their portfolio.
                 </Timeline.Body>
               </Timeline.Content>
             </Timeline.Item>

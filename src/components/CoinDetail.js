@@ -1,9 +1,25 @@
 import { ColorType, createChart } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Card, Badge } from "flowbite-react";
+import { useParams } from "react-router-dom";
+import { Card, Badge, Checkbox } from "flowbite-react";
+import { auth, db } from "../utils/Firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  setDoc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+import AddToast from "./AddToast";
+import RemoveToast from "./RemoveToast";
+import LoginToast from "./LoginToast";
 
 const CoinDetail = () => {
+  const [user] = useAuthState(auth);
+  const [isAddedToWatchlist, setIsAddedToWatchlist] = useState(false);
+
   const chartContainerRef = useRef();
 
   const params = useParams();
@@ -11,6 +27,24 @@ const CoinDetail = () => {
 
   const [priceHistory, setPriceHistory] = useState([]);
   const [coin, setCoin] = useState({});
+
+  const addToastRef = useRef();
+  const removeToastRef = useRef();
+  const LoginToastRef = useRef();
+
+  useEffect(() => {
+    const checkIfAddedToWatchlist = async () => {
+      if (user) {
+        const watchlistRef = doc(db, "watchlists", user.uid);
+        const docSnap = await getDoc(watchlistRef);
+        if (docSnap.exists()) {
+          setIsAddedToWatchlist(docSnap.data().watchlist.includes(id));
+        }
+      }
+    };
+
+    checkIfAddedToWatchlist();
+  }, [user, id]);
 
   useEffect(() => {
     const chart = createChart(chartContainerRef.current, {
@@ -39,6 +73,44 @@ const CoinDetail = () => {
       }
     };
   }, [priceHistory]);
+
+  const handleWatchlist = async (e) => {
+    if (user) {
+      const watchlistRef = doc(db, "watchlists", user.uid);
+      setDoc(watchlistRef, { capital: true }, { merge: true });
+
+      if (e.target.checked) {
+        // add to watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayUnion(id),
+        });
+        setIsAddedToWatchlist(true);
+        handleAddToast();
+      } else {
+        // remove from watchlist
+        await updateDoc(watchlistRef, {
+          watchlist: arrayRemove(id),
+        });
+        setIsAddedToWatchlist(false);
+        handleRemoveToast();
+      }
+    } else {
+      // if not logged in
+      handleLoginToast();
+    }
+  };
+
+  const handleAddToast = () => {
+    addToastRef.current.showToast();
+  };
+
+  const handleRemoveToast = () => {
+    removeToastRef.current.showToast();
+  };
+
+  const handleLoginToast = () => {
+    LoginToastRef.current.showToast();
+  };
 
   useEffect(() => {
     const options = {
@@ -94,12 +166,26 @@ const CoinDetail = () => {
 
   return (
     <div>
+      <AddToast ref={addToastRef} timeout={3000}></AddToast>
+      <RemoveToast ref={removeToastRef} timeout={3000}></RemoveToast>
+      <LoginToast ref={LoginToastRef} timeout={3000}></LoginToast>
+
       <Card className="w-11/12 max-w-screen-xl m-auto my-5" href="#">
-        <div className="flex justify-start items-center">
-          <img src={coin?.iconUrl} className="w-7"></img>
-          <h5 className="mx-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {coin?.name} Price Chart
-          </h5>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex justify-start items-center">
+            <img src={coin?.iconUrl} className="w-7"></img>
+            <h5 className="mx-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              {coin?.name} Price Chart
+            </h5>
+          </div>
+          <div className="flex items-center border border-slate-300 rounded-md my-2 p-2 w-fit">
+            <Checkbox
+              className="mr-2"
+              checked={isAddedToWatchlist}
+              onChange={handleWatchlist}
+            ></Checkbox>
+            <p>{isAddedToWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}</p>
+          </div>
         </div>
 
         <div className="w-11/12 m-auto" ref={chartContainerRef}></div>
