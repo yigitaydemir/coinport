@@ -14,8 +14,8 @@ import {
 import { db } from "../utils/Firebase";
 import { Link } from "react-router-dom";
 import { Checkbox } from "flowbite-react";
-import AddToast from "./AddToast";
-import RemoveToast from "./RemoveToast";
+import AddToast from "../components/AddToast";
+import RemoveToast from "../components/RemoveToast";
 
 const Watchlist = () => {
   const [user] = useAuthState(auth);
@@ -28,10 +28,7 @@ const Watchlist = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([
-        getWatchlist(),
-        fetchCoinsData()
-      ]);
+      await Promise.all([getWatchlist(), fetchCoinsData()]);
     };
 
     fetchData();
@@ -41,12 +38,14 @@ const Watchlist = () => {
     const options = {
       headers: {
         "Content-Type": "application/json",
-        "x-access-token":
-        `${process.env.REACT_APP_COINRANKING_KEY}`,
+        "x-access-token": `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
     };
 
-    const response = await fetch("https://api.coinranking.com/v2/coins", options);
+    const response = await fetch(
+      "https://api.coinranking.com/v2/coins",
+      options
+    );
     const result = await response.json();
     setCoins(result.data.coins);
 

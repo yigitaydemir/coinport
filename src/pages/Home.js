@@ -1,6 +1,5 @@
-import React from "react";
-import Hero from "./Hero";
-import Coins from "./Coins";
+import Hero from "../components/Hero";
+import Coins from "../components/Coins";
 
 const Home = () => {
   return (

@@ -12,9 +12,9 @@ import {
   updateDoc,
   getDoc,
 } from "firebase/firestore";
-import AddToast from "./AddToast";
-import RemoveToast from "./RemoveToast";
-import LoginToast from "./LoginToast";
+import AddToast from "../components/AddToast";
+import RemoveToast from "../components/RemoveToast";
+import LoginToast from "../components/LoginToast";
 
 const CoinDetail = () => {
   const [user] = useAuthState(auth);
@@ -115,8 +115,7 @@ const CoinDetail = () => {
   useEffect(() => {
     const options = {
       headers: {
-        "x-access-token":
-        `${process.env.REACT_APP_COINRANKING_KEY}`,
+        "x-access-token": `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
     };
 
@@ -182,11 +181,18 @@ const CoinDetail = () => {
               checked={isAddedToWatchlist}
               onChange={handleWatchlist}
             ></Checkbox>
-            <p>{isAddedToWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}</p>
+            <p>
+              {isAddedToWatchlist
+                ? "Remove from Watchlist"
+                : "Add to Watchlist"}
+            </p>
           </div>
         </div>
 
-        <div className="w-11/12 m-auto overflow-auto" ref={chartContainerRef}></div>
+        <div
+          className="w-11/12 m-auto overflow-auto"
+          ref={chartContainerRef}
+        ></div>
 
         <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
           <p>Description</p>
