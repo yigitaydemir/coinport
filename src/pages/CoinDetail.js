@@ -26,7 +26,12 @@ const CoinDetail = () => {
   const { id } = params;
 
   const [priceHistory, setPriceHistory] = useState([]);
+
+  //data fetching
   const [coin, setCoin] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const abortControllerRef = useRef(null);
 
   const addToastRef = useRef();
   const removeToastRef = useRef();
@@ -117,24 +122,60 @@ const CoinDetail = () => {
       headers: {
         "x-access-token": `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
+      signal: abortControllerRef.current?.signal,
     };
 
-    fetch(
-      `https://api.coinranking.com/v2/coin/${id}/history?timePeriod=1y`,
-      options
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        const apiResponse = data.data.history;
-        setPriceHistory(convertData(apiResponse));
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    const getPriceHistory = async () => {
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
 
-    fetch(`https://api.coinranking.com/v2/coin/${id}`, options)
-      .then((response) => response.json())
-      .then((result) => setCoin(result.data.coin));
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          `https://api.coinranking.com/v2/coin/${id}/history?timePeriod=1y`,
+          options
+        );
+        const data = await response.json();
+        setPriceHistory(convertData(data.data.history));
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getPriceHistory();
+
+    const getCoin = async () => {
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          `https://api.coinranking.com/v2/coin/${id}`,
+          options
+        );
+        const data = await response.json();
+        setCoin(data.data.coin);
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getCoin();
   }, [id]);
 
   const convertData = (apiResponse) => {
@@ -167,59 +208,72 @@ const CoinDetail = () => {
       <RemoveToast ref={removeToastRef} timeout={3000}></RemoveToast>
       <LoginToast ref={LoginToastRef} timeout={3000}></LoginToast>
 
-      <Card className="w-11/12 max-w-screen-xl m-auto my-5" href="#">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-          <div className="flex justify-start items-center">
-            <img src={coin?.iconUrl} className="w-7"></img>
-            <h5 className="mx-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              {coin?.name} Price Chart
-            </h5>
-          </div>
-          <div className="flex items-center border border-slate-300 rounded-md my-2 p-2 w-fit">
-            <Checkbox
-              className="mr-2"
-              checked={isAddedToWatchlist}
-              onChange={handleWatchlist}
-            ></Checkbox>
-            <p>
-              {isAddedToWatchlist
-                ? "Remove from Watchlist"
-                : "Add to Watchlist"}
-            </p>
-          </div>
+      {isLoading ? (
+        <div className="w-11/12 max-w-screen-xl m-auto my-5 flex justify-start items-center">
+          <h1 className="text-black text-2xl">Loading...</h1>
         </div>
+      ) : error ? (
+        <div className="w-11/12 max-w-screen-xl m-auto my-5 flex justify-start items-center">
+          <h1 className="text-black text-2xl">
+            There is an error, please try again later... <br></br>
+            {error}
+          </h1>
+        </div>
+      ) : (
+        <Card className="w-11/12 max-w-screen-xl m-auto my-5" href="#">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+            <div className="flex justify-start items-center">
+              <img src={coin.iconUrl} className="w-7"></img>
+              <h5 className="mx-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {coin.name} Price Chart
+              </h5>
+            </div>
+            <div className="flex items-center border border-slate-300 rounded-md my-2 p-2 w-fit">
+              <Checkbox
+                className="mr-2"
+                checked={isAddedToWatchlist}
+                onChange={handleWatchlist}
+              ></Checkbox>
+              <p>
+                {isAddedToWatchlist
+                  ? "Remove from Watchlist"
+                  : "Add to Watchlist"}
+              </p>
+            </div>
+          </div>
 
-        <div
-          className="w-11/12 m-auto overflow-auto"
-          ref={chartContainerRef}
-        ></div>
+          <div
+            className="w-11/12 m-auto overflow-auto"
+            ref={chartContainerRef}
+          ></div>
 
-        <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-          <p>Description</p>
-        </h5>
-        <p className="font-normal text-gray-700 dark:text-gray-400">
-          {coin?.description}
-        </p>
+          <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <p>Description</p>
+          </h5>
+          <p className="font-normal text-gray-700 dark:text-gray-400">
+            {coin.description}
+          </p>
 
-        <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-          <p>Related Links</p>
-        </h5>
-        <div className="flex flex-wrap">
-          <Badge color="info" className="m-2">
-            <a href={coin?.websiteUrl} target="blank">
-              Website
-            </a>
-          </Badge>
-
-          {coin.links?.map((link) => (
+          <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <p>Related Links</p>
+          </h5>
+          <div className="flex flex-wrap">
             <Badge color="info" className="m-2">
-              <a href={link.url} target="blank">
-                {link.name}
+              <a href={coin.websiteUrl} target="blank">
+                Website
               </a>
             </Badge>
-          ))}
-        </div>
-      </Card>
+
+            {coin.links.map((link) => (
+              <Badge color="info" className="m-2">
+                <a href={link.url} target="blank">
+                  {link.name}
+                </a>
+              </Badge>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
