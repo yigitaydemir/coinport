@@ -76,6 +76,7 @@ const Coins = () => {
   useEffect(() => {
     if (user && coins) {
       const watchlistRef = doc(db, "watchlists", user.uid);
+
       getDoc(watchlistRef)
         .then((docSnap) => {
           if (docSnap.exists()) {

@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 import { Checkbox } from "flowbite-react";
 import AddToast from "../components/AddToast";
 import RemoveToast from "../components/RemoveToast";
+import Loading from "../components/Loading";
+import Error from "../components/Error";
 
 const Watchlist = () => {
   const [user] = useAuthState(auth);
@@ -23,8 +25,9 @@ const Watchlist = () => {
 
   //data fetching
   const [coins, setCoins] = useState();
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const abortControllerRef = useRef(null);
 
   const [checkboxStates, setCheckboxStates] = useState({});
 
@@ -40,27 +43,43 @@ const Watchlist = () => {
   }, [user]);
 
   const fetchCoinsData = async () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+
+    setIsLoading(true);
+    setError(null);
+
     const options = {
       headers: {
         "Content-Type": "application/json",
         "x-access-token": `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
+      signal: abortControllerRef.current?.signal,
     };
 
-    const response = await fetch(
-      "https://api.coinranking.com/v2/coins",
-      options
-    );
-    const result = await response.json();
-    setCoins(result.data.coins);
+    try {
+      const response = await fetch(
+        "https://api.coinranking.com/v2/coins",
+        options
+      );
+      const result = await response.json();
+      setCoins(result.data.coins);
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
+      setError(error.message);
+    } finally {
+      // Remove the re-declaration of watchlist here
+      if (coins && watchlist) {
+        const initialCheckboxStates = coins.reduce((acc, coin) => {
+          acc[coin.uuid] = watchlist.includes(coin.uuid);
+          return acc;
+        }, {});
+        setCheckboxStates(initialCheckboxStates);
+      }
 
-    // Remove the re-declaration of watchlist here
-    if (coins && watchlist) {
-      const initialCheckboxStates = coins.reduce((acc, coin) => {
-        acc[coin.uuid] = watchlist.includes(coin.uuid);
-        return acc;
-      }, {});
-      setCheckboxStates(initialCheckboxStates);
+      setIsLoading(false);
     }
   };
 
@@ -184,48 +203,54 @@ const Watchlist = () => {
               </Table.Head>
 
               <Table.Body className="divide-y">
-                {coins
-                  ?.filter((coin) => watchlist?.includes(coin.uuid))
-                  .map((coin) => (
-                    <Table.Row
-                      key={coin.rank}
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="!p-4">
-                        <Checkbox
-                          value={coin.uuid}
-                          onChange={(e) => handleWatchlist(e, coin.uuid)}
-                          checked={checkboxStates[coin.uuid] || false}
-                        />
-                      </Table.Cell>
-                      <Table.Cell>{coin.rank}</Table.Cell>
-                      <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
-                        <img src={coin.iconUrl} className="w-7"></img>
-                        <Link to={`/coins/${coin.uuid}`}>
-                          <span className="mx-2 text-gray-900 dark:text-white">
-                            {coin.name}
-                          </span>
-                        </Link>
-
-                        <span className="text-grey-100">{coin.symbol}</span>
-                      </Table.Cell>
-                      <Table.Cell className="text-right">
-                        {Number(coin.price).toFixed(5)}
-                      </Table.Cell>
-                      <Table.Cell
-                        className={
-                          Number(coin.change) < 0
-                            ? "text-red-500 text-right"
-                            : "text-green-500 text-right"
-                        }
+                {isLoading ? (
+                  <Loading></Loading>
+                ) : error ? (
+                  <Error message={error}></Error>
+                ) : (
+                  coins
+                    ?.filter((coin) => watchlist?.includes(coin.uuid))
+                    .map((coin) => (
+                      <Table.Row
+                        key={coin.rank}
+                        className="bg-white dark:border-gray-700 dark:bg-gray-800"
                       >
-                        {coin.change}
-                      </Table.Cell>
-                      <Table.Cell className="text-right">
-                        {Number(coin.marketCap).toLocaleString()}
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
+                        <Table.Cell className="!p-4">
+                          <Checkbox
+                            value={coin.uuid}
+                            onChange={(e) => handleWatchlist(e, coin.uuid)}
+                            checked={checkboxStates[coin.uuid] || false}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>{coin.rank}</Table.Cell>
+                        <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
+                          <img src={coin.iconUrl} className="w-7"></img>
+                          <Link to={`/coins/${coin.uuid}`}>
+                            <span className="mx-2 text-gray-900 dark:text-white">
+                              {coin.name}
+                            </span>
+                          </Link>
+
+                          <span className="text-grey-100">{coin.symbol}</span>
+                        </Table.Cell>
+                        <Table.Cell className="text-right">
+                          {Number(coin.price).toFixed(5)}
+                        </Table.Cell>
+                        <Table.Cell
+                          className={
+                            Number(coin.change) < 0
+                              ? "text-red-500 text-right"
+                              : "text-green-500 text-right"
+                          }
+                        >
+                          {coin.change}
+                        </Table.Cell>
+                        <Table.Cell className="text-right">
+                          {Number(coin.marketCap).toLocaleString()}
+                        </Table.Cell>
+                      </Table.Row>
+                    ))
+                )}
               </Table.Body>
             </Table>
           </div>
