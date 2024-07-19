@@ -20,7 +20,12 @@ import RemoveToast from "../components/RemoveToast";
 const Watchlist = () => {
   const [user] = useAuthState(auth);
   const [watchlist, setWatchlist] = useState();
+
+  //data fetching
   const [coins, setCoins] = useState();
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+
   const [checkboxStates, setCheckboxStates] = useState({});
 
   const addToastRef = useRef();

@@ -14,7 +14,8 @@ import {
 import AddToast from "./AddToast";
 import RemoveToast from "./RemoveToast";
 import LoginToast from "./LoginToast";
-import "ldrs/ring";
+import Loading from "./Loading";
+import Error from "./Error";
 
 const Coins = () => {
   const [user] = useAuthState(auth);
@@ -161,31 +162,9 @@ const Coins = () => {
           </Table.Head>
           <Table.Body className="divide-y">
             {isLoading ? (
-              <Table.Row>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell>
-                  <h1 className="text-black text-2xl">Loading...</h1>
-                </Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-              </Table.Row>
+              <Loading></Loading>
             ) : error ? (
-              <Table.Row>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell>
-                  <div className="text-black text-2xl">
-                    <h1>There is an error, please try again later...</h1>
-                    <br></br>
-                    <p>Error message: {error}</p>
-                  </div>
-                </Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell></Table.Cell>
-              </Table.Row>
+              <Error message={error}></Error>
             ) : (
               currentCoins?.map((coin) => (
                 <Table.Row
