@@ -14,39 +14,62 @@ import {
 import AddToast from "./AddToast";
 import RemoveToast from "./RemoveToast";
 import LoginToast from "./LoginToast";
+import "ldrs/ring";
 
 const Coins = () => {
   const [user] = useAuthState(auth);
 
+  //data fetching
   const [coins, setCoins] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const abortControllerRef = useRef(null);
 
+  //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [coinsPerPage, setCoinsPerPage] = useState(10);
 
   const [checkboxStates, setCheckboxStates] = useState({});
 
+  //toast notifications
   const addToastRef = useRef();
   const removeToastRef = useRef();
   const LoginToastRef = useRef();
 
   useEffect(() => {
-    let isMounted = true;
-
     const options = {
       headers: {
         "Content-Type": "application/json",
-        "x-access-token":
-          `${process.env.REACT_APP_COINRANKING_KEY}`,
+        "x-access-token": `${process.env.REACT_APP_COINRANKING_KEY}`,
       },
+      signal: abortControllerRef.current?.signal,
     };
 
-    fetch("https://api.coinranking.com/v2/coins", options)
-      .then((response) => response.json())
-      .then((result) => setCoins(result.data.coins));
+    const getCoins = async (options) => {
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
 
-    return () => {
-      isMounted = false; // Cleanup function to set isMounted to false on unmount
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          "https://api.coinranking.com/v2/coins",
+          options
+        );
+        const data = await response.json();
+        setCoins(data.data.coins);
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
+
+    getCoins(options);
   }, []);
 
   useEffect(() => {
@@ -137,46 +160,74 @@ const Coins = () => {
             <Table.HeadCell className="text-right">Market Cap</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {currentCoins?.map((coin) => (
-              <Table.Row
-                key={coin.rank}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800"
-              >
-                <Table.Cell className="!p-4">
-                  <Checkbox
-                    value={coin.uuid}
-                    onChange={(e) => handleWatchlist(e, coin.uuid)}
-                    checked={checkboxStates[coin.uuid] || false}
-                  />
+            {isLoading ? (
+              <Table.Row>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell>
+                  <h1 className="text-black text-2xl">Loading...</h1>
                 </Table.Cell>
-                <Table.Cell>{coin.rank}</Table.Cell>
-                <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
-                  <img src={coin.iconUrl} className="w-7"></img>
-                  <Link to={`/coins/${coin.uuid}`}>
-                    <span className="mx-2 text-gray-900 dark:text-white">
-                      {coin.name}
-                    </span>
-                  </Link>
-
-                  <span className="text-grey-100">{coin.symbol}</span>
-                </Table.Cell>
-                <Table.Cell className="text-right">
-                  {Number(coin.price).toFixed(5)}
-                </Table.Cell>
-                <Table.Cell
-                  className={
-                    Number(coin.change) < 0
-                      ? "text-red-500 text-right"
-                      : "text-green-500 text-right"
-                  }
-                >
-                  {coin.change}
-                </Table.Cell>
-                <Table.Cell className="text-right">
-                  {Number(coin.marketCap).toLocaleString()}
-                </Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
               </Table.Row>
-            ))}
+            ) : error ? (
+              <Table.Row>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell>
+                  <div className="text-black text-2xl">
+                    <h1>There is an error, please try again later...</h1>
+                    <br></br>
+                    <p>Error message: {error}</p>
+                  </div>
+                </Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+              </Table.Row>
+            ) : (
+              currentCoins?.map((coin) => (
+                <Table.Row
+                  key={coin.rank}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <Table.Cell className="!p-4">
+                    <Checkbox
+                      value={coin.uuid}
+                      onChange={(e) => handleWatchlist(e, coin.uuid)}
+                      checked={checkboxStates[coin.uuid] || false}
+                    />
+                  </Table.Cell>
+                  <Table.Cell>{coin.rank}</Table.Cell>
+                  <Table.Cell className="flex justify-start items-center whitespace-nowrap font-medium">
+                    <img src={coin.iconUrl} className="w-7"></img>
+                    <Link to={`/coins/${coin.uuid}`}>
+                      <span className="mx-2 text-gray-900 dark:text-white">
+                        {coin.name}
+                      </span>
+                    </Link>
+
+                    <span className="text-grey-100">{coin.symbol}</span>
+                  </Table.Cell>
+                  <Table.Cell className="text-right">
+                    {Number(coin.price).toFixed(5)}
+                  </Table.Cell>
+                  <Table.Cell
+                    className={
+                      Number(coin.change) < 0
+                        ? "text-red-500 text-right"
+                        : "text-green-500 text-right"
+                    }
+                  >
+                    {coin.change}
+                  </Table.Cell>
+                  <Table.Cell className="text-right">
+                    {Number(coin.marketCap).toLocaleString()}
+                  </Table.Cell>
+                </Table.Row>
+              ))
+            )}
           </Table.Body>
         </Table>
       </div>
