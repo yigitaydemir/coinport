@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# CoinPort
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The primary purpose of this application is to provide users with the ability to monitor cryptocurrency prices and assess their historical performance through interactive charts. By signing up with your Google account, you can effortlessly personalize your experience by adding your preferred cryptocurrencies to a designated watchlist.
 
 ## Available Scripts
 
